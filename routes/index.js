@@ -11,4 +11,4 @@ if(req.session && req.session.username && req.session.username.length){
     res.render('login', { title: 'login',success: "false" });
     
 });
-module.exports;
+module.exports = router;

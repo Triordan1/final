@@ -1,0 +1,345 @@
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    </head>
+
+<body class="bg-secondary">
+
+    <header class="d-flex justify-content-between bg-dark text-light p-2">
+        <span class="w-75">
+            <div class="input-group mb-3 w-50">
+                <div class="input-group-prepend">
+                </div>
+            </div>
+                <h1 id="displayUsername"></h1>
+                 <div id="bitchreview">
+                <input id="searchfield" type="text" class="form-control" aria-label="Text input with dropdown button" placeholder="Invite Link" readonly>
+            </div>
+            
+        </span>
+        <span class = "d-flex flex-column justify-content-center">
+            <div>
+
+
+            </div>
+            <div>
+                <a id="signIn" class="btn btn-info" href = "/login" role = "button">Sign In</a>
+                <a id="signOut" class="btn btn-info" role = "button">Sign Out</a>
+            </div>
+            
+        </span>
+    </header>
+     <div class="modal" id="myModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Add Time Slot</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="d-flex mb-3 justify-content-between">
+                    <span>Date:</span> <input type="date" id="addDAte"><br>
+                    </div><div class="d-flex mb-3 justify-content-between">
+                    <span>Start Time:</span> <input type="time" id="addStart"><br>
+                    </div><div class="d-flex mb-3 justify-content-between">
+                    <span>End Time:</span> <input type="time" id="addEnd"><br>
+                    </div>
+                    <div id="result"></div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="addSlot">Add Slot</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="deletion">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="d-flex mb-3 justify-content-between">
+                        <span>Start Time:</span> <input type="text" id="removeStart" readonly><br>
+                    </div><div class="d-flex mb-3 justify-content-between">
+                    <span>End Time:</span> <input type="text" id="removeEnd" readonly><br>
+                </div><div class="d-flex mb-3 justify-content-between">
+                    <span>Are you sure you want to remove the time slot? This cannot be undone.</span> <br>
+                </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <a type="button" class="btn btn-primary text-white" id="removeing">Delete</a>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!--/////////////////////////////////////////////////////////////////////////////-->
+    <div class="d-flex justify-content-center">
+        <div id="main" class="w-75 h-100 bg-light rounded-bottom bg-light rounded-bottom p-3" style="height: 100%;">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Start Time</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col">Booked By</th>
+                    <th scope="col"><button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+                        Add Time Slot
+                    </button></th>
+                </tr>
+                </thead>
+                <tbody id="in">
+
+                </tbody>
+            </table>
+        </div>
+
+
+
+        <hr class="m-3">
+    </div>
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script>
+        //display username of who is logged in
+        $('#displayUsername').html("{{logged}}");
+        $(document).ready(function() {
+            $.ajax({
+                type: "POST",
+                url: "/users/getbookings",
+                dataType: "json",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    pageOwner: "{{logged}}"
+                }),
+                success: function(result, status) {
+                    console.log(result);
+                    console.log(result.success);
+                    if (result.response) {
+                        console.log(result);
+                    } else {
+                        console.log(result.message);
+                    }
+                    console.log("result is this: ", result);
+                    //console.log("please work ", result.retrievedReviews[0].userid);
+                    for (let i = 0; i < result.retrievedReviews.length; i++) {
+                        if (new Date(result.retrievedReviews[i].Date.substring(0, 10)) > new Date()) {
+                            let booked = result.retrievedReviews[i].booked;
+                            let date = result.retrievedReviews[i].Date.substring(0, 10);
+                            let start = result.retrievedReviews[i].Start.substring(0, 5);
+                            let end = result.retrievedReviews[i].End.substring(0, 5);
+                            let duration = (new Date("1970-1-1 " + end) - new Date("1970-1-1 " + start)) / 1000 / 60 / 60;
+                            let min = Math.floor((new Date("1970-1-1 " + end).getTime() - new Date("1970-1-1 " + start).getTime()) / 1000 / 60);
+                            let hour = Math.floor(min / 60);
+                            min = min % 60;
+                            duration = new Date(1970, 1, 1, hour, min);
+                            if (duration.getMinutes() <= 9) {
+                                min = "0" + min;
+                            } else {
+                                min = duration.getMinutes();
+                            }
+                            duration = duration.getHours() + ":" + min;
+                            console.log("hour", hour);
+                            console.log("min", min);
+                            let total = hour + ":" + min;
+                            console.log("duration", duration);
+                            console.log(booked);
+                            if (booked == null) {
+                                booked = "Not Booked";
+                            }
+                            if (new Date("1970-1-1 " + start) > new Date(1970, 1, 1, 12, 0, 0)) {
+                                start = new Date("1970-1-1 " + start) - new Date(1970, 1, 1, 12, 0, 0) / 1000 / 60 / 60;
+                                start = start + " PM";
+                            } else {
+                                start = start + " AM";
+                            }
+                            console.log(booked);
+                            $("#in").append(`
+                                    <tr>
+                                            <th class="font-weight-bold">${date}</th>
+                                            <th class="font-weight-bold">${start}</th>
+                                            <th class="font-weight-bold">${duration}</th>
+                                            <th class="font-weight-bold">${booked}</th>
+                                            <th>
+                                            <button type='button' id="ebutton${i}" class='btn btn-info' value="${result.retrievedReviews[i].sheduleId}" >Details</button><br>
+                                            <button type='button' id="dbutton${i}" class="btn btn-info" value="${result.retrievedReviews[i].sheduleId}" >Delete</button>
+                                            </th>
+                                        
+                                    </tr>
+                                    `);
+                            $(`#dbutton${i}`).click(function () {
+                                passData(`${result.retrievedReviews[i].sheduleId}`)
+                            });
+                        }
+                    }
+                }
+            });
+            function passData(id) {
+                $.ajax({
+                   url: "users/getbooking",
+                   method: "POST",
+                   data:{
+                       slotId: id
+                   },
+                    success: function (result,status) {
+                       console.log("hours",result.retrievedReviews[0].Date);
+                       console.log("year",result.retrievedReviews[0].Date.substring(0,4));
+                       console.log("month",result.retrievedReviews[0].Date.substring(5,7));
+                       console.log("day", result.retrievedReviews[0].Date.substring(8,10));
+                       let year = parseInt(result.retrievedReviews[0].Date.substring(0,4));
+                       let month = parseInt(result.retrievedReviews[0].Date.substring(5,7));
+                       let day = parseInt(result.retrievedReviews[0].Date.substring(8,10));
+                       let hour = parseInt(result.retrievedReviews[0].Start.substring(0,2));
+                       let min = parseInt(result.retrievedReviews[0].Start.substring(3,5));
+                       console.log(year);
+                       console.log(month);
+                       console.log(day);
+                       let start = new Date(year,month-1,day,hour,min);
+                       hour = parseInt(result.retrievedReviews[0].End.substring(0,2));
+                        min = parseInt(result.retrievedReviews[0].End.substring(3,5));
+                        let end = new Date(year,month-1,day,hour,min);
+                       console.log(result);
+                       console.log(result.retrievedReviews[0].Date.substring(0,10)+" "+result.retrievedReviews[0].Start.substring(0,5));
+                       //start = new Date(result.retrievedReviews[0].Date.substring(0,10) + start);
+                       console.log(start);
+                       //let end = new Date(result.retrievedReviews[0].Date + result.retrievedReviews[0].End);
+                       $("#removeStart").val(start);
+                       $("#removeEnd").val(end);
+                       $("#removeing").val(id);
+                       $("#deletion").modal('toggle');
+                    }
+                });
+            }
+            function deleteReview(id) {
+                
+                
+                $.ajax({
+                    url: "/users/deletebooking",
+                    method: "POST",
+                    data: {
+                        reviewid: id
+                    }
+                    ,
+                    success: function(result, status) {
+                        console.log(result);
+                        if (result.successful) {
+                        }
+                        else {
+                            $("#errorMessage").html(result.message).css("color", 'red');
+                        }
+                        location.reload();
+                    }
+                }); //ajax
+            }
+            if ("{{loggedIn}}") {
+                $("#signIn").hide();
+                $(".btns").show();
+            }
+            else {
+                $("#signOut").hide();
+                $(".btns").hide();
+            }
+            $("#signOut").on("click", logout);
+            function logout() {
+                $.ajax({
+                    url: "/login/signOut",
+                    method: "GET",
+                    success: function(result, status) {
+                        console.log(result);
+                        
+                        if (result.successful) {
+                            window.location.href = "/";
+                        }
+                        else {
+                            $("#errorMessage").html(result.message).css("color", 'red');
+                        }
+                    }
+                }); //ajax
+            }
+            function isValid() {
+                var result = true;
+                
+                if ($("#addDAte").val() === "") {
+                    result = false;
+                    $("#result").html("Date required");
+                    $("#result").css("color", "red");
+                }
+                else if ($("#addStart").val() === "") {
+                    result = false;
+                    $("#result").html("Start Time required");
+                    $("#result").css("color", "red");
+                }
+                else if ($("#addEnd").val() === "") {
+                    result = false;
+                    $("#result").html("End Time required");
+                    $("#result").css("color", "red");
+                }else if ($("#addEnd").val() <= $("#addStart").val()){
+                    result= false;
+                    $("#result").html("End Time must be after Start Time");
+                    $("#result").css("color", "red");
+                }
+                else {
+                    $("#result").html("");
+                    $("#result").css("color", "green");
+                }
+                return result;
+            }
+            $(document).on("click", "#addSlot", function() {
+                console.log("review:", $("#addDAte").val());
+                console.log("score:", $("#addStart").val());
+                console.log("score:", $("#addEnd").val());
+                if (isValid()) {
+                    //$("#myModal").modal().hide();
+                    console.log("it was valid, bitch");
+                    $.ajax({
+                        type: "POST",
+                        url: "/users/booking",
+                        dataType: "json",
+                        contentType: "application/json",
+                        data: JSON.stringify({
+                            Date: $("#addDAte").val(),
+                            Start: $("#addStart").val(),
+                            End: $("#addEnd").val()
+                        }),
+                        success: function(data, status) {
+                            console.log(data);
+                            console.log(data.success);
+                            if (data.response) {
+                                console.log(data);
+                                location.reload();
+                            }
+                            else {
+                                console.log(data.message);
+                            }
+                        }
+                    });
+                    console.log("after ajax");
+                }
+            });
+            $("#removeing").on("click",function () {
+                deleteReview($("#removeing").val());
+            });
+        });
+    </script>
+</body>

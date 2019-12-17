@@ -8,7 +8,7 @@ var session = require('express-session');
 var async = require('async')
 const request = require('request');
 const bcrypt = require('bcrypt');
-const saltRounds = 10;
+const Rounds = 10;
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -27,7 +27,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({
   secret:"uDPZH0ZRe6"
-}))
+}));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -54,7 +54,7 @@ function normalizeport(val){
     return val;
   }
   if(port >= 0){
-    return port
+    return port;
   }
   return false;
 }

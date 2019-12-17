@@ -1,2 +1,186 @@
-<h1>{{title}}</h1>
-<p>Welcome to {{title}}</p>
+<!doctype html>
+<html>
+{{!--background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');--}}
+{{!--background-size: cover;--}}
+{{!--background-repeat: repeat;--}}
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css">
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <style>
+        .imgs {
+            width: 154px;
+            margin: 2px;
+        }
+        #body {
+            height: 80%;
+        }
+    </style>
+</head>
+
+<body class="bg-secondary text-light">
+    
+    <header class="d-flex justify-content-between bg-dark text-light p-2">
+        <span class = "w-75">
+            <h1>{{title}}</h1>
+            <div>
+                <div class="input-group mb-3 w-50">
+                            <div class="input-group-prepend">
+                                <button id="searchbutton" class="btn btn-outline-secondary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Search</button>
+                            </div>
+                            <input id="searchfield" type="text" class="form-control" aria-label="Text input with dropdown button">
+                </div>
+                <div class="">
+                    <input type="radio" name="searchoptions" value="movies" class="m-1" checked>Movies
+                    <input type="radio" name="searchoptions" value="users"  class="m-1 ml-3">Users
+                </div>
+            </div>
+        </span>
+        <span class = "d-flex flex-column justify-content-center">
+            <div>
+
+                <!--<a href="/users?username={{username}}"><img src="img/accountdefault.png" width="64" height = "64" class="rounded-circle m-2"></a>-->
+                <img id="homePageAvatar" src="img/accountdefault.png"width="64" height = "64" class="rounded-circle m-2"/>
+            </div>
+            <div>
+            <a id="signIn" class="btn btn-info" href = "/login" role = "button">Sign In</a>
+            <a id="signOut" class="btn btn-info" role = "button">Sign Out</a>
+            </div>
+            
+            <div>
+                <a id="currentlyLoggedIn" class="btn btn-info" href = "/users" role = "button">username</a>
+            </div>
+            
+        </span>
+    </header>
+    
+    <div class="d-flex justify-content-center">
+        <div class="w-75 bg-secondary h-100 p-5 bg-light" id="body">
+            
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <script>
+         $(document).ready(function () {
+        console.log("loaded homepage.js");
+        //$('#signOut').hide();
+        console.log(JSON.parse(("{{success}}")));
+        
+            if(JSON.parse(("{{success}}"))){
+                console.log("value of success",JSON.parse(("{{success}}")) );
+                $('#signIn').hide();
+                
+                console.log("{{loggedIn}}");
+                $('#currentlyLoggedIn').html("{{loggedIn}}");
+                $('#currentlyLoggedIn').show();
+                //make ajax call in here to get req.session.username
+                    //set currentlyLoggedIn to that username and display it
+                        //make it clickable
+                            //when clicked redirect to user page of user logged in
+                
+            }else{
+                console.log("is the else statement working?")
+                $('#signOut').hide();
+                $('#currentlyLoggedIn').hide();
+            }
+        
+        $.ajax({
+            type: "GET",
+            url: "https://api.themoviedb.org/3/movie/now_playing?api_key=f67394d8499af012dfdbf0c4f1fcb53a&language=en-US&page=1",
+            dataType: "json",
+            contentType: "application/json",
+            success: function (data, status) {
+                console.log(data);
+                $("#body").append("<h3 class='text-center text-dark font-weight-bold'>Now Playing</h3>");
+                $("#body").append("<div id='movs' class='d-flex flex-wrap justify-content-center font-weight-bold'></div>");
+                for (var i = 0; i< data.results.length; i++) {
+                    $("#movs").append(`
+                    <span class='imgs'>
+                        <img class='border' src='http://image.tmdb.org/t/p/w154/${data.results[i].poster_path}'>
+                        <div class='text-center imgs'>
+                            <a href='/movie?id=${data.results[i].id}'>${data.results[i].title}</a>
+                        </div>
+                    </span>`);
+                }
+            }
+        });
+        
+        $("#searchbutton").on("click", function () {
+            
+            console.log('clicked search button');
+            
+            if($("#searchfield").val() !== ""){
+                if($("input[name='searchoptions']:checked").val() == "movies")
+                {
+                    console.log("searching for movies");
+                    //SEARCHING FOR MOVIES
+                    $.ajax({
+                       type: "GET",
+                       url: "https://api.themoviedb.org/3/search/movie?api_key=f67394d8499af012dfdbf0c4f1fcb53a&language=en-US&query="+$("#searchfield").val()+"&page=1&include_adult=false",
+                        dataType: "json",
+                        contentType: "application/json",
+                        success: function (data,status) {
+                            console.log('success function');
+                            console.log(data);
+                            $("#movs").empty();
+                            if (data.results.length != 0) {
+                                for (var b = 0; b < data.results.length; b++) {
+                                    $("#movs").append(`
+                                    <span class="imgs">
+                                       <img src="https://image.tmdb.org/t/p/w154/${data.results[b].poster_path}">
+                                       <div class="text-center imgs">
+                                           <a href="/movie?id=${data.results[b].id}">${data.results[b].title}</a>
+                                       </div>
+                                    </span>`);
+                                }
+                            }else{
+                                $("#movs").append("<p class='text-center'> No Results</p>")
+                            }
+                        }
+                    });
+                }
+                else if($("input[name='searchoptions']:checked").val() == "users")
+                {
+                   //SEARCHING FOR USERS 
+                   console.log("searching for users");
+                }
+                
+            }
+        });
+        
+        
+        
+    //logout listener
+    $("#signOut").on("click", logout);
+    function logout() {
+        $.ajax({
+            url: "/login/signOut",
+            method: "GET",
+            success: function(result, status) {
+                console.log(result);
+                if (result.successful) {
+                    window.location.href = "/";
+                }
+                else {
+                    $("#errorMessage").html(result.message).css("color", 'red');
+                }
+            }
+        }); //ajax
+    }
+        
+        
+        
+    });
+    </script>
+</body>
+<footer class="d-flex justify-content-center">
+    <div class = "footer">
+        <h3>&copy; Movie List 2019</h3>
+        </div>
+</footer>
+
+</html>
