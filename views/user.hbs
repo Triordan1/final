@@ -91,7 +91,6 @@
             </div>
         </div>
     </div>
-    <!--/////////////////////////////////////////////////////////////////////////////-->
     <div class="d-flex justify-content-center">
         <div id="main" class="w-75 h-100 bg-light rounded-bottom bg-light rounded-bottom p-3" style="height: 100%;">
             <table class="table">
@@ -189,7 +188,7 @@
                                     </tr>
                                     `);
                             $(`#dbutton${i}`).click(function () {
-                                passData(`${result.retrievedReviews[i].sheduleId}`)
+                                passData(`${result.retrievedReviews[i].scheduleId}`)
                             });
                         }
                     }
@@ -314,7 +313,7 @@
                     console.log("it was valid, bitch");
                     $.ajax({
                         type: "POST",
-                        url: "/users/booking",
+                        url: "/users/bookApp",
                         dataType: "json",
                         contentType: "application/json",
                         data: JSON.stringify({

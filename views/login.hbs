@@ -47,8 +47,41 @@
 		</div>
 	</div>
 </div>
-
-<script src="/javascripts/auth.js"></script>
-
+<script>
+            $(document).ready(function() {
+    //event listener
+    $("#login").on('click', login);
+    function login() {
+        console.log($("#password").val());
+        $.ajax({
+            type: "POST",
+            url: "/login",
+            dataType: "json",
+            contentType: "application/json",
+            data: JSON.stringify({
+                    "username": $("#username").val(),
+                    "password": $("#password").val(),
+                }),
+             success: function (data, status) {
+             console.log("got data back", data);
+             if (data.error) {
+                     $("#result").html(data.error).css('color', 'red');
+                     console.log("ahhh");
+                    } else {
+                        console.log(window.location.href);
+                        window.location.href = "/front";
+                    }
+            },
+                        error: function(xhr, status, error) {
+                error = eval("(" + xhr.responseText + ")");
+                console.error(error);
+            },
+            complete: function(data, status) { //optional, used for debugging purposes
+                console.log(status);
+            }
+        }); //AJAX
+    } //login
+});
+</script>
 </body>
 </html>
